@@ -40,6 +40,19 @@ Click on the &#9654; marker to expand
 
 ![the parity check tableau of the {{:instance_name}} instance of this code family](./{{{:instance_name}}}.png)
 
+{{#:has_artifacts}}
+#### Downloads
+
+@@small
+Parity-check matrices are binary over GF(2). The full matrix uses `(X|Z)` column order.
+@@
+
+{{#:artifact_downloads}}
+- [{{:label}}]({{{:href}}}) - {{:description}}
+{{/:artifact_downloads}}
+
+{{/:has_artifacts}}
+
 {{#:has_encoding}}
 #### Encoding Circuit
 
