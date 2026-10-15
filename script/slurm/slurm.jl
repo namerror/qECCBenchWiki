@@ -36,7 +36,18 @@ const HEAVY_TASKS = [
     :TwoBlockGroupAlgebra,
     :Triangular488,
     :Triangular666,
+    :NithinCode,
 ]
+
+const SCHEDULED_FAMILIES = Set(vcat(LIGHT_TASKS, HEAVY_TASKS))
+const METADATA_FAMILIES = Set(
+    Symbol(Helpers.typenameof(codetype))
+    for codetype in keys(CodeMetadata.code_metadata)
+    if codetype != CodeMetadata.Concat
+)
+SCHEDULED_FAMILIES == METADATA_FAMILIES || error(
+    "Slurm task lists must cover every non-Concat code family in CodeMetadata.code_metadata",
+)
 
 const TASK_DETAIL_FIELDS = ("code_instance", "decoder", "setup")
 
@@ -403,8 +414,10 @@ addprocs(SlurmManager(), exeflags="--project=$(pwd())")
     end
 
     function run_task_body(task_manifest)
-        task_name = Symbol(task_manifest["family"])
-        task = getproperty(CodeMetadata, task_name)
+        task = only(
+            codetype for codetype in keys(CodeMetadata.code_metadata)
+            if string(Helpers.typenameof(codetype)) == task_manifest["family"]
+        )
         code_instance_filter = haskey(task_manifest, "code_instance") ? [task_manifest["code_instance"]] : nothing
         decoder_filter = haskey(task_manifest, "decoder") ? [task_manifest["decoder"]] : nothing
         setup_filter = haskey(task_manifest, "setup") ? [task_manifest["setup"]] : nothing
